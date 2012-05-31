@@ -1,10 +1,11 @@
+db = require('./dataprovider').db
 express = require('express')
 routes = require('./routes')
 instances = require('./routes/instances')
 hermes = require('./routes/hermes')
 
-app = module.exports = express.createServer()
 
+app = module.exports = express.createServer()
 
 app.configure ->
     app.set('views', __dirname + '/views')

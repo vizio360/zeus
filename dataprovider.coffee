@@ -1,5 +1,6 @@
-sqlite3 = requirer('sqlite3').verbose()
+sqlite3 = require('sqlite3').verbose()
 
+# global db accessor
 db = new sqlite3.Database 'database/zeus.db'
 
 
