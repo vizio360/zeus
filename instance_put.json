@@ -1,0 +1,6 @@
+{
+    "maxConnections": 20,
+    "ip": "11.0.0.10",
+    "port": 1,
+    "machineId": "i345345345"
+}
