@@ -331,7 +331,7 @@ function addMethod(app, callback, spec) {
         callback(req,res); }
       catch(ex) {
         if (ex.code && ex.description) {
-          res.send(JSON.stringify(ex), ex.code); }
+          res.send(ex.code, JSON.stringify(ex)); }
         else {
           console.error(spec.method + " failed for path '" + fullPath + "': " + ex);
           res.send(JSON.stringify({"description":"unknown error","code":500})) 
