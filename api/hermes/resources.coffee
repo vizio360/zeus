@@ -34,7 +34,7 @@ exports.getInstanceById = {
                         details =
                             id: hermesDetails.id
                             maxConnections: hermesDetails.maxConnections
-                            ip: hermesDetails.ip
+                            ip: hermesDetails.ipAddress
                             port: hermesDetails.port
                             machineId: hermesDetails.machineId
 
