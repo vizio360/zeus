@@ -110,7 +110,7 @@ exports.putMachine = {
                     # TODO
                     # expect internal ip from instance
                     # create the munin config file in /etc/munin/munin-conf.d/<name>
-                    command = "echo -e \"[#{machineId}]\n   address #{privateIp}\n   use_node_name yes\n\" | sudo tee -a /etc/munin/munin-conf.d/#{machineId}"
+                    command = "echo \"[#{machineId}]\n   address #{privateIp}\n   use_node_name yes\n\" | sudo tee -a /etc/munin/munin-conf.d/#{machineId}"
                     exec command, (error, stdout, stderr) =>
                         if error?
                             console.log "could not create munin conf file for node"
