@@ -2,6 +2,9 @@ machine = require('../../lib/machine').Machine
 models = require('./models')
 swagger = require('../../subtrees/swagger/Common/node/swagger.js')
 apiConfig = require('../config')
+# FIXME
+# this shouldn't be in this file
+exec = require('child_process').exec
 
 
 exports.getMachineById = {
@@ -96,13 +99,23 @@ exports.putMachine = {
             machineId = req.params.id
             ip = req.body.ip
             type = req.body.type
+            privateIp = req.body.privateIp
 
             machine.search machineId, (err, instances) ->
 
                 if (instances.length > 0)
-                    machine.update machineId, ip, type
+                    machine.update machineId, ip, privateIp, type
                     res.send(200)
                 else
-                    machine.create machineId, ip, type
-                    res.send(201)
+                    # TODO
+                    # expect internal ip from instance
+                    # create the munin config file in /etc/munin/munin-conf.d/<name>
+                    command = "echo -e \"[#{machineId}]\n   address #{privateIp}\n   use_node_name yes\n\" | sudo tee -a /etc/munin/munin-conf.d/#{machineId}"
+                    exec command, (error, stdout, stderr) =>
+                        if error?
+                            console.log "could not create munin conf file for node"
+                            res.send(500)
+                            return
+                        machine.create machineId, ip, privateIp, type
+                        res.send(201)
     }

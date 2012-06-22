@@ -4,13 +4,13 @@ class Machine
 
     tableName: "machine"
 
-    create: (id, ip, type) =>
-        insert = db.prepare "INSERT INTO #{@tableName} values(?, ?, ?)"
-        insert.run id, ip, type
+    create: (id, ip, privateIp, type) =>
+        insert = db.prepare "INSERT INTO #{@tableName}(id, ip, privateIp, type) values(?, ?, ?, ?)"
+        insert.run id, ip, privateIp, type
             
-    update: (id, ip, type) =>
-        update = db.prepare "UPDATE #{@tableName} set ip = ?, type = ? WHERE id = ?"
-        update.run ip, type, id
+    update: (id, ip, privateIp, type) =>
+        update = db.prepare "UPDATE #{@tableName} set ip = ?, privateIp = ?, type = ? WHERE id = ?"
+        update.run ip, privateIp, type, id
 
     list: (callback) =>
         db.all "select * from #{@tableName}", callback
