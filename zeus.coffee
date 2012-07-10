@@ -33,14 +33,7 @@ swagger.setAppHandler app
 
 swagger.discover(require("./api/hermes/resources"))
 swagger.discover(require("./api/machine/resources"))
-#hermesSwagger = require("./api/hermes/resources")
-#swagger.addGet(hermesSwagger.GET)
 swagger.configure(apiConfig.basePath, "0.1")
-
-#app.get('/', routes.index)
-#
-#app.put("/hermes/:id", hermes.PUT)
-#app.get("/hermes/:id?", hermes.GET)
 
 http.createServer(app).listen app.get('port'), () ->
   console.log("Express server listening on port " + app.get('port'))
