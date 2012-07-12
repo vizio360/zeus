@@ -20,6 +20,9 @@ class Machine
         where = "WHERE id = '#{id}'" if id?
         db.all "select * from #{@tableName} #{where}", callback
 
+    delete: (id, callback) =>
+        where = "WHERE id = '#{id}'"
+        db.all "delete from #{@tableName} #{where}", callback
 
 
 # creating a singleton

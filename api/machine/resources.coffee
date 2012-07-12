@@ -1,3 +1,4 @@
+os = require 'os'
 machine = require('../../lib/machine').Machine
 models = require('./models')
 swagger = require('../../subtrees/swagger/Common/node/swagger.js')
@@ -5,6 +6,7 @@ apiConfig = require('../config')
 # FIXME
 # this shouldn't be in this file
 exec = require('child_process').exec
+apiConfig = require('../config')
 
 
 exports.getMachineById = {
@@ -118,4 +120,111 @@ exports.putMachine = {
                             return
                         machine.create machineId, ip, privateIp, type
                         res.send(201)
+    }
+
+exports.postMachineCreate = {
+        'spec': {
+            "description": "Starts the procedure to create a new Amazon Ec2 machine",
+            "path": "/machine/create/",
+            "method": "POST",
+            "notes": "blah blah",
+            "summary": "Creates new Amazon Ec2 machine",
+            "params": new Array(
+                    swagger.postParam("Amazon EC2 instance type", "string"),
+                    swagger.postParam("Number of Hermes Instances to install", "int"),
+                    swagger.postParam("Amazon Image Id to use", "string")
+                ),
+            "errorResponses": new Array(
+                swagger.error(500, "something wrong happened!"),
+                ),
+            "nickname": "AmazonEc2MachineManager"
+        },
+        'action': (req,res) ->
+
+            instanceType = req.body.instanceType
+            hermesCount = req.body.hermesCount
+            imageId = req.body.imageId
+
+            attr =
+                zeus:
+                    endPoint: "#{apiConfig.basePath}"
+                    internalIp: "#{os.hostname()}"
+                amazon:
+                    meta_data_ws: "http://169.254.169.254/latest/meta-data/"
+                hermes:
+                    number_of_instances: hermesCount
+
+            # run the knife-ec2 command in another process so to not
+            # block the request
+            cmd = "knife ec2 server create "
+            cmd += "-x ubuntu "
+            cmd += "-r \"role[hermes]\" "
+            cmd += "-G olympus "
+            cmd += "-f #{instanceType} "
+            cmd += "-I #{imageId} "
+            cmd += "-j '" + JSON.stringify(attr) + "'"
+
+            exec cmd, (error, stdout, stderr) =>
+                if error?
+                    console.log "Error while running knife to create machine"
+                    console.log "stdout", stdout
+                    console.log "stderr", stderr
+                    return
+                console.log "Successfully created machine"
+                console.log "stdout", stdout
+
+            res.send(202)
+    }
+
+
+exports.postMachineDelete = {
+        'spec': {
+            "description": "Starts the procedure to delete a Amazon Ec2 machine",
+            "path": "/machine/delete/",
+            "method": "POST",
+            "notes": "blah blah",
+            "summary": "Deletes Amazon Ec2 machine",
+            "params": new Array(
+                    swagger.postParam("Amazon EC2 instance id", "string"),
+                ),
+            "errorResponses": new Array(
+                swagger.error(500, "something wrong happened!"),
+                ),
+            "nickname": "AmazonEc2MachineDelete"
+        },
+
+        'action': (req,res) ->
+
+            instanceId = req.body.instanceId
+
+            # terminating the ec2 machine
+            cmd = "knife ec2 server delete --yes  "
+            cmd += " #{instanceId} "
+
+            exec cmd, (error, stdout, stderr) =>
+                if error?
+                    console.log "Error while running knife to delete an ec2 machine"
+                    console.log "stderr", stderr
+                    return
+                console.log "Successfully deleted ec2 machine #{instanceId}"
+
+            # deleting chef node from chef server
+            cmd = "knife node delete --yes "
+            cmd += " #{instanceId} "
+
+            exec cmd, (error, stdout, stderr) =>
+                if error?
+                    console.log "Error while running knife to delete a node"
+                    console.log "stderr", stderr
+                    return
+                console.log "Successfully deleted node #{instanceId}"
+
+            # TODO
+            # maybe I should map this one to a DELETE
+            machine.delete instanceId, (err) =>
+                if err?
+                    console.log "An error occured while deleting #{instanceId} machine"
+                    res.send(500)
+                    return
+                res.send(202)
     }

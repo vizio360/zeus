@@ -1,0 +1,5 @@
+{
+    "instanceType": "t1.micro",
+    "hermesCount": 2,
+    "imageId": "ami-1cbc1b75"
+}
