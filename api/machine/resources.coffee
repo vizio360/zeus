@@ -118,8 +118,8 @@ exports.putMachine = {
                             console.log "could not create munin conf file for node"
                             res.send(500)
                             return
-                        machine.create machineId, ip, privateIp, type
-                        res.send(201)
+                        machine.create machineId, ip, privateIp, type, (err) =>
+                            res.send(201)
     }
 
 exports.postMachineCreate = {

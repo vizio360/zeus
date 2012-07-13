@@ -4,13 +4,11 @@ class Machine
 
     tableName: "machine"
 
-    create: (id, ip, privateIp, type) =>
-        insert = db.prepare "INSERT INTO #{@tableName}(id, ip, privateIp, type) values(?, ?, ?, ?)"
-        insert.run id, ip, privateIp, type
+    create: (id, ip, privateIp, type, callback) =>
+        db.run "INSERT INTO #{@tableName}(id, ip, privateIp, type) values(?, ?, ?, ?)", [id, ip, privateIp, type], callback
             
-    update: (id, ip, privateIp, type) =>
-        update = db.prepare "UPDATE #{@tableName} set ip = ?, privateIp = ?, type = ? WHERE id = ?"
-        update.run ip, privateIp, type, id
+    update: (id, ip, privateIp, type, callback) =>
+        db.run "UPDATE #{@tableName} set ip = ?, privateIp = ?, type = ? WHERE id = ?", [ip, privateIp, type, id], callback
 
     list: (callback) =>
         db.all "select * from #{@tableName}", callback
@@ -21,8 +19,7 @@ class Machine
         db.all "select * from #{@tableName} #{where}", callback
 
     delete: (id, callback) =>
-        where = "WHERE id = '#{id}'"
-        db.all "delete from #{@tableName} #{where}", callback
+        db.run "DELETE FROM #{tableName} WHERE id = ?", [id], callback
 
 
 # creating a singleton

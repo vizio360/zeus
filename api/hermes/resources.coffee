@@ -108,9 +108,9 @@ exports.putInstance = {
             hermes.search hermesId, (err, instances) ->
 
                 if (instances.length > 0)
-                    hermes.update hermesId, maxConnections, ip, port, machineId
-                    res.send(200)
+                    hermes.update hermesId, maxConnections, ip, port, machineId, (err) =>
+                        res.send(200)
                 else
-                    hermes.create hermesId, maxConnections, ip, port, machineId
-                    res.send(201)
+                    hermes.create hermesId, maxConnections, ip, port, machineId, (err) =>
+                        res.send(201)
     }

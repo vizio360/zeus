@@ -5,12 +5,10 @@ class Hermes
     tableName: "hermes"
 
     create: (id, maxConnections, ip, port, ec2Instance, callback) =>
-        insert = db.prepare "INSERT INTO #{@tableName} values(?, ?, ?, ?, ?)"
-        insert.run id, maxConnections, ip, port, ec2Instance
+        db.run "INSERT INTO #{@tableName} values(?, ?, ?, ?, ?)", [id, maxConnections, ip, port, ec2Instance], callback
             
     update: (id, maxConnections, ip, port, ec2Instance, callback) =>
-        update = db.prepare "UPDATE #{@tableName} set maxConnections = ?, ipAddress = ?, port = ?, machineId = ? WHERE id = ?"
-        update.run maxConnections, ip, port, ec2Instance, id
+        db.run "UPDATE #{@tableName} set maxConnections = ?, ipAddress = ?, port = ?, machineId = ? WHERE id = ?", [update.run maxConnections, ip, port, ec2Instance, id], callback
 
     list: (callback) =>
         db.all "select * from #{@tableName}", callback
