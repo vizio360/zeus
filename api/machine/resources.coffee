@@ -145,12 +145,13 @@ exports.postMachineCreate = {
             hermesCount = req.body.hermesCount
             imageId = req.body.imageId
 
+
             attr =
                 zeus:
                     endPoint: "#{apiConfig.basePath}"
-                    internalIp: "#{os.hostname()}"
+                    internalIp: "#{apiConfig.internalDNS}"
                 amazon:
-                    meta_data_ws: "http://169.254.169.254/latest/meta-data/"
+                    meta_data_ws: "#{apiConfig.amazon_ws}"
                 hermes:
                     number_of_instances: hermesCount
 

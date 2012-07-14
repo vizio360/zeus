@@ -8,6 +8,7 @@
   "dependencies": {
     "express": "3.0.0beta2",
     "jade": "*",
-    "sqlite3": "2.1.x"
+    "sqlite3": "2.1.x",
+    "restler": "2.0.1"
   }
 }

@@ -5,6 +5,7 @@ hermes = require('./routes/hermesAPI')
 http = require('http')
 swagger = require('./subtrees/swagger/Common/node/swagger.js')
 apiConfig = require('./api/config')
+rest = require('restler')
 
 
 app = express()
@@ -35,5 +36,13 @@ swagger.discover(require("./api/hermes/resources"))
 swagger.discover(require("./api/machine/resources"))
 swagger.configure(apiConfig.basePath, "0.1")
 
-http.createServer(app).listen app.get('port'), () ->
-  console.log("Express server listening on port " + app.get('port'))
+rest.get(apiConfig.amazon_ws+"local-hostname").on "complete", (result) =>
+    if result instanceof Error
+        console.log "an error occured while getting the internal DNS from amazon"
+        console.log result
+        return
+    apiConfig.internalDNS = result
+    http.createServer(app).listen app.get('port'), () ->
+        console.log("Express server listening on port " + app.get('port'))
+
+
