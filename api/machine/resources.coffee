@@ -5,7 +5,7 @@ swagger = require('../../subtrees/swagger/Common/node/swagger.js')
 apiConfig = require('../config')
 # FIXME
 # this shouldn't be in this file
-exec = require('child_process').exec
+execFile = require('child_process').execFile
 apiConfig = require('../config')
 
 
@@ -155,17 +155,9 @@ exports.postMachineCreate = {
                 hermes:
                     number_of_instances: hermesCount
 
-            # run the knife-ec2 command in another process so to not
-            # block the request
-            cmd = "knife ec2 server create "
-            cmd += "-x ubuntu "
-            cmd += "-r \"role[hermes]\" "
-            cmd += "-G olympus "
-            cmd += "-f #{instanceType} "
-            cmd += "-I #{imageId} "
-            cmd += "-j '" + JSON.stringify(attr) + "'"
+            args = ["#{instanceType}", "#{imageId}", "'"+JSON.stringify(attr)+"'"]
 
-            exec cmd, (error, stdout, stderr) =>
+            execFile apiConfig.createMachineScript, args ,(error, stdout, stderr) =>
                 if error?
                     console.log "Error while running knife to create machine"
                     console.log "stdout", stdout
@@ -198,22 +190,9 @@ exports.postMachineDelete = {
 
             instanceId = req.body.instanceId
 
-            # terminating the ec2 machine
-            cmd = "knife ec2 server delete --yes  "
-            cmd += " #{instanceId} "
+            args = ["#{instanceId}"]
 
-            exec cmd, (error, stdout, stderr) =>
-                if error?
-                    console.log "Error while running knife to delete an ec2 machine"
-                    console.log "stderr", stderr
-                    return
-                console.log "Successfully deleted ec2 machine #{instanceId}"
-
-            # deleting chef node from chef server
-            cmd = "knife node delete --yes "
-            cmd += " #{instanceId} "
-
-            exec cmd, (error, stdout, stderr) =>
+            execFile apiConfig.deleteMachineScript, args, (error, stdout, stderr) =>
                 if error?
                     console.log "Error while running knife to delete a node"
                     console.log "stderr", stderr

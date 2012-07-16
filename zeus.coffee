@@ -29,18 +29,20 @@ app.configure 'production', ->
     app.use(express.errorHandler())
 
 
-apiConfig.basePath = "http://#{os.hostname()}:#{app.get('port')}"
-swagger.setAppHandler app
-
-swagger.discover(require("./api/hermes/resources"))
-swagger.discover(require("./api/machine/resources"))
-swagger.configure(apiConfig.basePath, "0.1")
 
 rest.get(apiConfig.amazon_ws+"local-hostname").on "complete", (result) =>
     if result instanceof Error
         console.log "an error occured while getting the internal DNS from amazon"
         console.log result
         return
+
+    apiConfig.basePath = "http://#{result}:#{app.get('port')}"
+    swagger.setAppHandler app
+
+    swagger.discover(require("./api/hermes/resources"))
+    swagger.discover(require("./api/machine/resources"))
+    swagger.configure(apiConfig.basePath, "0.1")
+
     apiConfig.internalDNS = result
     http.createServer(app).listen app.get('port'), () ->
         console.log("Express server listening on port " + app.get('port'))

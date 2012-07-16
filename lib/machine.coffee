@@ -19,7 +19,7 @@ class Machine
         db.all "select * from #{@tableName} #{where}", callback
 
     delete: (id, callback) =>
-        db.run "DELETE FROM #{tableName} WHERE id = ?", [id], callback
+        db.run "DELETE FROM #{@tableName} WHERE id = ?", [id], callback
 
 
 # creating a singleton
