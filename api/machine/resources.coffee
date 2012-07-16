@@ -155,7 +155,7 @@ exports.postMachineCreate = {
                 hermes:
                     number_of_instances: hermesCount
 
-            args = ["#{instanceType}", "#{imageId}", "'"+JSON.stringify(attr)+"'"]
+            args = ["#{instanceType}", "#{imageId}", JSON.stringify(attr)]
 
             execFile apiConfig.createMachineScript, args ,(error, stdout, stderr) =>
                 if error?
