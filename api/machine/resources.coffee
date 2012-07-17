@@ -1,4 +1,5 @@
 os = require 'os'
+hermes = require('../../lib/hermes').Hermes
 machine = require('../../lib/machine').Machine
 models = require('./models')
 swagger = require('../../subtrees/swagger/Common/node/swagger.js')
@@ -6,6 +7,7 @@ apiConfig = require('../config')
 # FIXME
 # this shouldn't be in this file
 execFile = require('child_process').execFile
+exec = require('child_process').exec
 apiConfig = require('../config')
 
 
@@ -149,7 +151,7 @@ exports.postMachineCreate = {
             attr =
                 zeus:
                     endPoint: "#{apiConfig.basePath}"
-                    internalIp: "#{apiConfig.internalDNS}"
+                    internalIp: "#{apiConfig.internalIp}"
                 amazon:
                     meta_data_ws: "#{apiConfig.amazon_ws}"
                 hermes:
@@ -173,12 +175,12 @@ exports.postMachineCreate = {
 exports.postMachineDelete = {
         'spec': {
             "description": "Starts the procedure to delete a Amazon Ec2 machine",
-            "path": "/machine/delete/",
-            "method": "POST",
+            "path": "/machine/{id}",
+            "method": "DELETE",
             "notes": "blah blah",
             "summary": "Deletes Amazon Ec2 machine",
             "params": new Array(
-                    swagger.postParam("Amazon EC2 instance id", "string"),
+                    swagger.pathParam("id", "ID of the machine to delete", "string")
                 ),
             "errorResponses": new Array(
                 swagger.error(500, "something wrong happened!"),
@@ -188,7 +190,7 @@ exports.postMachineDelete = {
 
         'action': (req,res) ->
 
-            instanceId = req.body.instanceId
+            instanceId = req.params.id
 
             args = ["#{instanceId}"]
 
@@ -199,12 +201,15 @@ exports.postMachineDelete = {
                     return
                 console.log "Successfully deleted node #{instanceId}"
 
-            # TODO
-            # maybe I should map this one to a DELETE
             machine.delete instanceId, (err) =>
                 if err?
                     console.log "An error occured while deleting #{instanceId} machine"
                     res.send(500)
                     return
-                res.send(202)
+                hermes.deleteForMachine instanceId, (err) =>
+                    if err?
+                        console.log "An error occured while deleting hermes instances for #{instanceId} machine"
+                        res.send(500)
+                        return
+                    res.send(202)
     }

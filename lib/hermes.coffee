@@ -18,6 +18,8 @@ class Hermes
         where = "WHERE id = '#{id}'" if id?
         db.all "select * from #{@tableName} #{where}", callback
 
+    deleteForMachine: (machineId, callback) =>
+        db.run "DELETE FROM #{@tableName} WHERE machineId = ?", [machineId], callback
 
 
 # creating a singleton

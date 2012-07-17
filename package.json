@@ -9,6 +9,8 @@
     "express": "3.0.0beta2",
     "jade": "*",
     "sqlite3": "2.1.x",
-    "restler": "2.0.1"
+    "restler": "2.0.1",
+    "async" : "0.1.22",
+    "commander": "1.x"
   }
 }

@@ -6,7 +6,10 @@ http = require('http')
 swagger = require('./subtrees/swagger/Common/node/swagger.js')
 apiConfig = require('./api/config')
 rest = require('restler')
+async = require('async')
+commander = require('commander')
 
+commander.option('--noAmazonMetaData', 'avoid getting meta data for the machine from Amazon').parse(process.argv)
 
 app = express()
 
@@ -28,22 +31,42 @@ app.configure 'development', ->
 app.configure 'production', ->
     app.use(express.errorHandler())
 
+getInfo= (endPoint, callback) =>
+    if commander.noAmazonMetaData?
+        callback(null, "")
+        return
+    rest.get(endPoint).on 'complete', (result) =>
+        if result instanceof Error
+            console.log "an error occured while getting #{endPoint} from amazon"
+            console.log result
+            callback(result)
+            return
+        callback(null, result)
+
+data =
+    privateIp:async.apply(getInfo, apiConfig.amazon_ws + 'local-ipv4')
+    dns: async.apply(getInfo, apiConfig.amazon_ws + 'public-hostname')
 
 
-rest.get(apiConfig.amazon_ws+"local-hostname").on "complete", (result) =>
-    if result instanceof Error
-        console.log "an error occured while getting the internal DNS from amazon"
-        console.log result
+
+async.parallel data, (err, results) =>
+    if err?
+        console.log "something went wrong while startig zeus"
+        console.log err
         return
 
-    apiConfig.basePath = "http://#{result}:#{app.get('port')}"
+    if results.dns == "" and results.privateIp == ""
+        results.dns = "localhost"
+        results.privateIp = "127.0.0.1"
+
+    apiConfig.basePath = "http://#{results.dns}:#{app.get('port')}"
     swagger.setAppHandler app
 
     swagger.discover(require("./api/hermes/resources"))
     swagger.discover(require("./api/machine/resources"))
     swagger.configure(apiConfig.basePath, "0.1")
 
-    apiConfig.internalDNS = result
+    apiConfig.internalIp = results.privateIp
     http.createServer(app).listen app.get('port'), () ->
         console.log("Express server listening on port " + app.get('port'))
 
