@@ -146,6 +146,8 @@ exports.postMachineCreate = {
             instanceType = req.body.instanceType
             hermesCount = req.body.hermesCount
             imageId = req.body.imageId
+            aws_access_key_id = req.body.awsAccessKeyId
+            aws_secret_access_key = req.body.awsSecretAccessKey
 
 
             attr =
@@ -157,7 +159,7 @@ exports.postMachineCreate = {
                 hermes:
                     number_of_instances: hermesCount
 
-            args = ["#{instanceType}", "#{imageId}", JSON.stringify(attr)]
+            args = ["#{instanceType}", "#{imageId}", JSON.stringify(attr), "#{aws_access_key_id}", "#{aws_secret_access_key}"]
 
             execFile apiConfig.createMachineScript, args ,(error, stdout, stderr) =>
                 if error?
@@ -191,8 +193,10 @@ exports.postMachineDelete = {
         'action': (req,res) ->
 
             instanceId = req.params.id
+            aws_access_key_id = req.body.awsAccessKeyId
+            aws_secret_access_key = req.body.awsSecretAccessKey
 
-            args = ["#{instanceId}"]
+            args = ["#{instanceId}", "#{aws_access_key_id}", "#{aws_secret_access_key}"]
 
             execFile apiConfig.deleteMachineScript, args, (error, stdout, stderr) =>
                 if error?
