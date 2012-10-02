@@ -135,6 +135,8 @@ exports.postMachineCreate = {
                     swagger.postParam("Amazon EC2 instance type", "string"),
                     swagger.postParam("Number of Hermes Instances to install", "int"),
                     swagger.postParam("Amazon Image Id to use", "string")
+                    swagger.postParam("Amazon Access Key ID", "string")
+                    swagger.postParam("Amazon Secret Access Key", "string")
                 ),
             "errorResponses": new Array(
                 swagger.error(500, "something wrong happened!"),
@@ -178,7 +180,7 @@ exports.postMachineDelete = {
         'spec': {
             "description": "Starts the procedure to delete a Amazon Ec2 machine",
             "path": "/machine/{id}",
-            "method": "DELETE",
+            "method": "POST",
             "notes": "blah blah",
             "summary": "Deletes Amazon Ec2 machine",
             "params": new Array(
